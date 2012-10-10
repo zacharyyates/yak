@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Yak.Test
@@ -17,6 +18,34 @@ namespace Yak.Test
         }
 
         [TestMethod]
+        public void ArrayIsNullOrEmpty()
+        {
+            object[] nullArray = null;
+            Assert.IsTrue(nullArray.IsNullOrEmpty());
+
+            object[] emptyArray = { };
+            Assert.IsTrue(emptyArray.IsNullOrEmpty());
+
+            object[] fullArray = { 1, "I'm a string", 2.04f, DateTime.Now };
+            Assert.IsFalse(fullArray.IsNullOrEmpty());
+        }
+
+        [TestMethod]
+        public void ListIsNullOrEmpty()
+        {
+            List<object> nullList = null;
+            Assert.IsTrue(nullList.IsNullOrEmpty());
+
+            List<object> emptyList = new List<object>{ };
+            Assert.IsTrue(emptyList.IsNullOrEmpty());
+
+            List<object> fullList = new List<object>() { 1, "I'm a string", 2.04f, DateTime.Now };
+            Assert.IsFalse(fullList.IsNullOrEmpty());
+        }
+
+        #region Strings
+
+        [TestMethod]
         public void StringIsNullOrEmpty()
         {
             string nullStr = null;
@@ -27,19 +56,6 @@ namespace Yak.Test
 
             string notNullOrEmptyStr = "not null or empty";
             Assert.IsFalse(notNullOrEmptyStr.IsNullOrEmpty());
-        }
-
-        [TestMethod]
-        public void EnumerableIsNullOrEmpty()
-        {
-            object[] nullArray = null;
-            Assert.IsTrue(nullArray.IsNullOrEmpty());
-
-            object[] emptyArray = { };
-            Assert.IsTrue(emptyArray.IsNullOrEmpty());
-
-            object[] fullArray = { 1, "I'm a string", 2.04f, DateTime.Now };
-            Assert.IsFalse(fullArray.IsNullOrEmpty());
         }
 
         [TestMethod]
@@ -57,6 +73,10 @@ namespace Yak.Test
             string notNullOrWhiteSpaceStr = "not null or whitespace";
             Assert.IsFalse(notNullOrWhiteSpaceStr.IsNullOrWhiteSpace());
         }
+
+        #endregion
+
+        #region Throw Helpers
 
         [TestMethod]
         public void ThrowIfNull()
@@ -132,5 +152,7 @@ namespace Yak.Test
                 Assert.AreEqual("whitespaceStr", ae.ParamName);
             }
         }
+
+        #endregion
     }
 }

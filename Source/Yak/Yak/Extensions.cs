@@ -9,6 +9,7 @@ namespace System
         {
             return obj == null;
         }
+
         public static bool IsNullOrEmpty<T>(this IEnumerable<T> enumerable)
         {
             if (enumerable == null) 
@@ -21,6 +22,14 @@ namespace System
 
             // IEnumerable<T>.Count is O(N), this is slower
             return !collection.Any();
+        }
+
+        public static bool IsNullOrEmpty<T>(this ICollection<T> collection)
+        {
+            if (collection == null)
+                return true;
+
+            return collection.Count < 1;
         }
 
         #region Strings
