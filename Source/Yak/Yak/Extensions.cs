@@ -1,6 +1,7 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Linq;
 
-namespace Yak
+namespace System
 {
     public static class Extensions
     {
@@ -8,23 +9,38 @@ namespace Yak
         {
             return obj == null;
         }
+        public static bool IsNullOrEmpty<T>(this IEnumerable<T> enumerable)
+        {
+            if (enumerable == null) 
+                return true;
+
+            // ICollection<T>.Count is O(1), this is faster if enumerable is a list
+            var collection = enumerable as ICollection<T>;
+            if (collection != null)
+                return collection.Count < 1;
+
+            // IEnumerable<T>.Count is O(N), this is slower
+            return !collection.Any();
+        }
+
+        #region Strings
+
         public static bool IsNullOrEmpty(this string str)
         {
             return string.IsNullOrEmpty(str);
         }
+
         public static bool IsNullOrWhiteSpace(this string str)
         {
             return string.IsNullOrWhiteSpace(str);
         }
-
-        #region String
 
         public static string FormatWith(this string format, params object[] args)
         {
             return string.Format(format, args);
         }
         
-        // todo: add an overload that uses culture info
+        // TODO: add an overload that uses culture info
 
         #endregion
 

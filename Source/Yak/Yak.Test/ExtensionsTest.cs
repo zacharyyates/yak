@@ -17,7 +17,7 @@ namespace Yak.Test
         }
 
         [TestMethod]
-        public void IsNullOrEmpty()
+        public void StringIsNullOrEmpty()
         {
             string nullStr = null;
             Assert.IsTrue(nullStr.IsNullOrEmpty());
@@ -30,7 +30,20 @@ namespace Yak.Test
         }
 
         [TestMethod]
-        public void IsNullOrWhiteSpace()
+        public void EnumerableIsNullOrEmpty()
+        {
+            object[] nullArray = null;
+            Assert.IsTrue(nullArray.IsNullOrEmpty());
+
+            object[] emptyArray = { };
+            Assert.IsTrue(emptyArray.IsNullOrEmpty());
+
+            object[] fullArray = { 1, "I'm a string", 2.04f, DateTime.Now };
+            Assert.IsFalse(fullArray.IsNullOrEmpty());
+        }
+
+        [TestMethod]
+        public void StringIsNullOrWhiteSpace()
         {
             string nullStr = null;
             Assert.IsTrue(nullStr.IsNullOrWhiteSpace());
