@@ -1,15 +1,43 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace System
 {
     public static class Extensions
     {
+        /// <summary>
+        /// Indicates whether an <see cref="System.Object"/> is null.
+        /// </summary>
         public static bool IsNull<T>(this T obj)
         {
             return obj == null;
         }
 
+        #region Enumerable
+
+        /// <summary>
+        /// Indicates whether an <see cref="System.Collections.IEnumerable"/> is null or contains no elements.
+        /// This method calls <see cref="Extensions.Any(IEnumerable)"/>, which may have unintended consequences with forward-only IEnumerable implementations.
+        /// </summary>
+        public static bool IsNullOrEmpty(this IEnumerable enumerable)
+        {
+            if (enumerable == null)
+                return true;
+
+            // ICollection.Count is O(1), this is faster if enumerable is a list
+            var collection = enumerable as ICollection;
+            if (collection != null)
+                return collection.Count < 1;
+
+            // IEnumerable.Count is O(N), this is slower and may have unintended consequences with forward-only IEnumerable implementations
+            return !enumerable.Any();
+        }
+
+        /// <summary>
+        /// Indicates whether an <see cref="System.Collections.Generic.IEnumerable<out T>"/> is null or contains no elements.
+        /// </summary>
         public static bool IsNullOrEmpty<T>(this IEnumerable<T> enumerable)
         {
             if (enumerable == null) 
@@ -24,6 +52,9 @@ namespace System
             return !collection.Any();
         }
 
+        /// <summary>
+        /// Indicates whether an <see cref="System.Collections.Generic.ICollection<T>"/> is null or contains no elements.
+        /// </summary>
         public static bool IsNullOrEmpty<T>(this ICollection<T> collection)
         {
             if (collection == null)
@@ -32,16 +63,53 @@ namespace System
             return collection.Count < 1;
         }
 
-        #region Strings
-
-        public static bool IsNullOrEmpty(this string str)
+        /// <summary>
+        /// Gets the number of elements contained in the <see cref="System.Collections.IEnumerable"/>.
+        /// This method iterates through the elements to perform the count, do not use on forward-only IEnumerable implementations or performance intensive scenarios.
+        /// </summary>
+        public static int Count(this IEnumerable enumerable)
         {
-            return string.IsNullOrEmpty(str);
+            Trace.TraceWarning("Using Extensions.Count(IEnumerable) is not recommended.");
+
+            enumerable.ThrowIfNull("enumerable");
+            
+            var count = 0;
+            var enumerator = enumerable.GetEnumerator();
+            while (enumerator.MoveNext()) 
+                count++;
+            
+            return count;
         }
 
-        public static bool IsNullOrWhiteSpace(this string str)
+        /// <summary>
+        /// Determines whether a sequence contains any elements.
+        /// This method calls <see cref="Extensions.Count(IEnumerable)"/>, which may have unintended consequences with forward-only IEnumerable implementations.
+        /// </summary>
+        public static bool Any(this IEnumerable enumerable)
         {
-            return string.IsNullOrWhiteSpace(str);
+            enumerable.ThrowIfNull("enumerable");
+
+            return enumerable.Count() > 0;
+        }
+
+        #endregion
+
+        #region Strings
+
+        /// <summary>
+        /// Indicates whether the specified string is null or an <see cref="System.String.Empty"/> string.
+        /// </summary>
+        public static bool IsNullOrEmpty(this string value)
+        {
+            return string.IsNullOrEmpty(value);
+        }
+
+        /// <summary>
+        /// Indicates whether the string is null, empty, or consists of only whitespace characters.
+        /// </summary>
+        public static bool IsNullOrWhiteSpace(this string value)
+        {
+            return string.IsNullOrWhiteSpace(value);
         }
 
         public static string FormatWith(this string format, params object[] args)
@@ -49,7 +117,7 @@ namespace System
             return string.Format(format, args);
         }
         
-        // TODO: add an overload that uses culture info
+        // TODO: add an overload that uses CultureInfo
 
         #endregion
 
@@ -64,23 +132,23 @@ namespace System
             if (obj.IsNull()) throw new ArgumentNullException(paramName);
         }
 
-        public static void ThrowIfNullOrEmpty(this string str)
+        public static void ThrowIfNullOrEmpty(this string value)
         {
-            if (str.IsNullOrEmpty()) throw new ArgumentException();
+            if (value.IsNullOrEmpty()) throw new ArgumentException();
         }
-        public static void ThrowIfNullOrEmpty(this string str, string paramName)
+        public static void ThrowIfNullOrEmpty(this string value, string paramName)
         {
-            if (str.IsNullOrEmpty())       
+            if (value.IsNullOrEmpty())       
                 throw new ArgumentException("{0} is null or empty.".FormatWith(paramName), paramName);
         }
 
-        public static void ThrowIfNullOrWhiteSpace(this string str)
+        public static void ThrowIfNullOrWhiteSpace(this string value)
         {
-            if (str.IsNullOrWhiteSpace()) throw new ArgumentException();
+            if (value.IsNullOrWhiteSpace()) throw new ArgumentException();
         }
-        public static void ThrowIfNullOrWhiteSpace(this string str, string paramName)
+        public static void ThrowIfNullOrWhiteSpace(this string value, string paramName)
         {
-            if (str.IsNullOrWhiteSpace())
+            if (value.IsNullOrWhiteSpace())
                 throw new ArgumentException("{0} is null or whitespace.".FormatWith(paramName), paramName);
         }
 

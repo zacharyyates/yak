@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -16,6 +17,8 @@ namespace Yak.Test
             object notNullObj = new object();
             Assert.IsFalse(notNullObj.IsNull());
         }
+
+        #region Enumerable
 
         [TestMethod]
         public void ArrayIsNullOrEmpty()
@@ -43,7 +46,22 @@ namespace Yak.Test
             Assert.IsFalse(fullList.IsNullOrEmpty());
         }
 
-        #region Strings
+        [TestMethod]
+        public void EnumerableIsNullOrEmpty()
+        {
+            IEnumerable<object> nullEnumerable = null;
+            Assert.IsTrue(nullEnumerable.IsNullOrEmpty());
+
+            IEnumerable emptyEnumerable = new ArrayList(){ };
+            Assert.IsTrue(emptyEnumerable.IsNullOrEmpty());
+
+            IEnumerable fullEnumerable = new ArrayList() { 1, "I'm a string", 2.04f, DateTime.Now };
+            Assert.IsFalse(fullEnumerable.IsNullOrEmpty());
+        }
+
+        #endregion
+
+        #region String
 
         [TestMethod]
         public void StringIsNullOrEmpty()
@@ -76,7 +94,7 @@ namespace Yak.Test
 
         #endregion
 
-        #region Throw Helpers
+        #region Throw
 
         [TestMethod]
         public void ThrowIfNull()
