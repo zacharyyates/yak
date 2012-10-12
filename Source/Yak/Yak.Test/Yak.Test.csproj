@@ -52,8 +52,10 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ExtensionsTest.cs" />
+    <Compile Include="TestSettings.cs" />
     <Compile Include="TypeExtensionsTest.cs" />
     <Compile Include="NumericExtensionsTest.cs" />
+    <Compile Include="Html\HtmlCompactorTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Yak\Yak.csproj">

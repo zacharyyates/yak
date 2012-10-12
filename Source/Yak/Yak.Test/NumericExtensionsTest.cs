@@ -8,7 +8,7 @@ namespace Yak.Test
     public class NumericExtensionsTest
     {
         [TestMethod]
-        public void OrderOfMagnitudeTest()
+        public void OrderOfMagnitude()
         {
             double aMillion = 1000000;
             Assert.AreEqual(6, aMillion.OrderOfMagnitude());
@@ -30,25 +30,27 @@ namespace Yak.Test
         }
 
         [TestMethod]
-        public void LongScaleTest()
+        public void LongScale()
         {
             long tenBillion = 10000000000;
-            Assert.AreEqual(LongScale.Milliard, tenBillion.LongScale());
+            Assert.AreEqual(System.Numerics.LongScale.Milliard, tenBillion.LongScale());
 
             // todo: add more test coverage here
         }
 
         [TestMethod]
-        public void ShortScaleTest()
+        public void ShortScale()
         {
             long tenBillion = 10000000000;
-            Assert.AreEqual(ShortScale.Billion, tenBillion.ShortScale());
+            Assert.AreEqual(System.Numerics.ShortScale.Billion, tenBillion.ShortScale());
 
             // todo: add more test coverage here
         }
 
+        // todo: add prefix test coverage
+
         [TestMethod]
-        public void SymbolTest()
+        public void Symbol()
         {
             long tenBillion = 10000000000;
             Assert.AreEqual("G", tenBillion.Symbol());
@@ -57,7 +59,7 @@ namespace Yak.Test
         }
 
         [TestMethod]
-        public void ToScaleTest()
+        public void ToScale()
         {
             // returns 125678 as 125.7k
             // returns 5678 as 5678
