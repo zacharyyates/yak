@@ -13,5 +13,7 @@ namespace System.Html
             output = output.Replace("\r", string.Empty);
             return output.ToString();
         }
+
+        // todo: look at this for further system.web enhancement http://cestdumeleze.net/blog/2011/minifying-the-html-with-asp-net-mvc-and-razor/
     }
 }
