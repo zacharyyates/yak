@@ -154,9 +154,9 @@ namespace System.Numerics
             return PrefixImpl((double)number);
         }
 
-        static string SymbolImpl(double number)
+        static string GetSymbolByScale(int scale)
         {
-            switch(GetScale(OrderOfMagnitudeImpl(number)))
+            switch (scale)
             {
                 case -24: return "y";
                 case -21: return "z";
@@ -168,10 +168,10 @@ namespace System.Numerics
                 case -3: return "m";
                 case -2: return "c";
                 case -1: return "d";
-                
+
                 default:
                 case 0: return string.Empty;
-                
+
                 case 1: return "da";
                 case 2: return "h";
                 case 3: return "k";
@@ -183,6 +183,10 @@ namespace System.Numerics
                 case 21: return "Z";
                 case 24: return "Y";
             }
+        }
+        static string SymbolImpl(double number)
+        {
+            return GetSymbolByScale(GetScale(OrderOfMagnitudeImpl(number)));
         }
 
         public static string Symbol(this double number)
@@ -210,46 +214,42 @@ namespace System.Numerics
             return SymbolImpl((double)number);
         }
 
-        static string ToStringImpl(double number, int characters)
+        static string ToScaleImpl(double number)
         {
-            var numberStr = number.ToString();
-
-            if (characters >= numberStr.Length)
+            if (number < 10000)
                 return number.ToString();
 
-            var scale = GetScale(OrderOfMagnitudeImpl(number));            
+            var scale = GetScale(OrderOfMagnitudeImpl(number));
             var result = number / Math.Pow(10, scale);
-            
-            var resultStr = result.ToString().Substring(0, characters);
-            if (resultStr.EndsWith(".") || resultStr.EndsWith(","))
-                resultStr = resultStr.Substring(0, resultStr.Length - 1);
 
-            return "{0}{1}".FormatWith(resultStr, SymbolImpl(number));
+            var decimals = 3 - (int)OrderOfMagnitudeImpl(result);
+            var rounded = Math.Round(result, decimals);
+            return "{0}{1}".FormatWith(rounded, GetSymbolByScale(scale));
         }
 
-        public static string ToString(this double number, int precision)
+        public static string ToScale(this double number)
         {
-            return ToStringImpl(number, precision);
+            return ToScaleImpl(number);
         }
-        public static string ToString(this long number, int precision)
+        public static string ToScale(this long number)
         {
-            return ToStringImpl(number, precision);
+            return ToScaleImpl(number);
         }
-        public static string ToString(this int number, int precision)
+        public static string ToScale(this int number)
         {
-            return ToStringImpl(number, precision);
+            return ToScaleImpl(number);
         }
-        public static string ToString(this short number, int precision)
+        public static string ToScale(this short number)
         {
-            return ToStringImpl(number, precision);
+            return ToScaleImpl(number);
         }
-        public static string ToString(this float number, int precision)
+        public static string ToScale(this float number)
         {
-            return ToStringImpl(number, precision);
+            return ToScaleImpl(number);
         }
-        public static string ToString(this decimal number, int precision)
+        public static string ToScale(this decimal number)
         {
-            return ToStringImpl((double)number, precision);
+            return ToScaleImpl((double)number);
         }
     }
 

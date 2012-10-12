@@ -57,17 +57,28 @@ namespace Yak.Test
         }
 
         [TestMethod]
-        public void ToStringTest()
+        public void ToScaleTest()
         {
+            // returns 125678 as 125.7k
+            // returns 5678 as 5678
+            // returns 9984948499 as 9.985G
+
+            int fiveK = 5678;
+            Assert.AreEqual("5678", fiveK.ToScale());
+
             long tenBillion = 10000000000;
-            Assert.AreEqual("10G", tenBillion.ToString(2));
+            Assert.AreEqual("10G", tenBillion.ToScale());
 
             long tenPointTwoOneFiveBillion = 10215000000;
-            Assert.AreEqual("10.2G", tenPointTwoOneFiveBillion.ToString(4));
+            Assert.AreEqual("10.22G", tenPointTwoOneFiveBillion.ToScale());
 
             // todo: add more test coverage here
             int oneHundredTwentyFiveThousand = 125000;
-            Assert.AreEqual("125k", oneHundredTwentyFiveThousand.ToString(3));
+            Assert.AreEqual("125k", oneHundredTwentyFiveThousand.ToScale());
+
+            // todo: add more test coverage here
+            int oneHundredTwentyFiveThousandSixHundred = 125678;
+            Assert.AreEqual("125.7k", oneHundredTwentyFiveThousandSixHundred.ToScale());
         }
     }
 }
