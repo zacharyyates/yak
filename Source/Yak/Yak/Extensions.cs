@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
 
 namespace System
 {
@@ -130,6 +131,18 @@ namespace System
         }
         
         // TODO: add an overload that uses CultureInfo
+
+        public static string Repeat(this char c, int count)
+        {
+            return new string(c, count);
+        }
+        public static string Repeat(this string str, int count)
+        {
+            var output = new StringBuilder();
+            for(int i = 0; i < count; i++)
+                output.Append(str);
+            return output.ToString();
+        }
 
         #endregion
 

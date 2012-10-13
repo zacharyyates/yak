@@ -2,7 +2,7 @@
 
 namespace Yak.Web.NQuery
 {
-    public interface INQuery : IHtmlElement, IManipulable, ITraversable, IEnumerable<INQuery>
+    public interface INQuery : IHtmlElement, IManipulable, ITraversable, ISelectable, IEnumerable<INQuery>
     {
     }
 }

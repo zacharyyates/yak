@@ -61,6 +61,7 @@
     <Compile Include="NQuery\IElement.cs" />
     <Compile Include="NQuery\IManipulable.cs" />
     <Compile Include="NQuery\INQuery.cs" />
+    <Compile Include="NQuery\ISelectable.cs" />
     <Compile Include="NQuery\ITraversable.cs" />
     <Compile Include="NQuery\NQuery.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
