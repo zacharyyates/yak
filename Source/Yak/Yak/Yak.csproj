@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\Generic\Extensions.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="NumericExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

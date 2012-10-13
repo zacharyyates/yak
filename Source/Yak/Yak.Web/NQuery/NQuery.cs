@@ -4,13 +4,13 @@ using HtmlAgilityPack;
 
 namespace System.Web.JQuery
 {
-    public class JQuery : IEnumerable<JQuery>
+    public class NQuery : IEnumerable<NQuery>
     {
         HtmlDocument m_Document;
         HtmlNode m_FirstNode;
         HtmlNodeCollection m_Nodes;
 
-        public JQuery LoadHtml(string html)
+        public NQuery LoadHtml(string html)
         {
             m_Document = new HtmlDocument();
             m_Document.LoadHtml(html);
@@ -19,7 +19,7 @@ namespace System.Web.JQuery
             return this;
         }
 
-        public JQuery this[string selector]
+        public NQuery this[string selector]
         {
             get { throw new NotImplementedException(); }
         }
@@ -57,7 +57,7 @@ namespace System.Web.JQuery
 
         #region IEnumerable Implementation
 
-        public IEnumerator<JQuery> GetEnumerator()
+        public IEnumerator<NQuery> GetEnumerator()
         {
             throw new NotImplementedException();
         }

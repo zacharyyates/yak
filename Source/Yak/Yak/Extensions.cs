@@ -1,7 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace System
 {
@@ -13,6 +14,17 @@ namespace System
         public static bool IsNull<T>(this T obj)
         {
             return obj == null;
+        }
+
+        public static T DeepClone<T>(this T obj)
+        {
+            using (var ms = new MemoryStream())
+            {
+                var formatter = new BinaryFormatter();
+                formatter.Serialize(ms, obj);
+                ms.Seek(0, SeekOrigin.Begin);
+                return (T)formatter.Deserialize(ms);
+            }
         }
 
         #region Enumerable
