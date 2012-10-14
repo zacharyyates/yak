@@ -3,9 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using HtmlAgilityPack;
-using Yak.Web.NQuery;
 
 namespace Yak.Web.Spiders
 {
@@ -18,7 +17,7 @@ namespace Yak.Web.Spiders
         public SpiderBase()
         {
             MaxConsumers = 25;
-            ShortSleep = 0;
+            ShortSleep = 500;
         }
 
         protected Task DownloadHtml(string address, Encoding encoding, HtmlLoaded callback)
@@ -64,38 +63,45 @@ namespace Yak.Web.Spiders
             return client;
         }
 
-        public virtual void Run()
+
+        // todo: add cancellation token impl, task awaitable
+        public virtual Task Run()
         {
-            using (Items = new BlockingCollection<string>())
+            var run = Task.Factory.StartNew(() =>
             {
-                var tasks = new List<Task>();
-                
-                var produce = Task.Factory.StartNew(() => Produce());
-                tasks.Add(produce);
-
-                for (int i = 0; i < MaxConsumers; i++)
+                using (Items = new BlockingCollection<string>())
                 {
-                    var consume = Task.Factory.StartNew(() =>
+                    var tasks = new List<Task>();
+
+                    var produce = Task.Factory.StartNew(() => ProduceTmpl());
+                    tasks.Add(produce);
+
+                    for (int i = 0; i < MaxConsumers; i++)
                     {
-                        var keepGoing = true;
-                        string address = null;
-                        while (keepGoing)
+                        var consume = Task.Factory.StartNew(() =>
                         {
-                            keepGoing = Items.TryTake(out address);
-                            Consume(address);
-                        }
-                    });
-                    tasks.Add(consume);
-                }
+                            string address = null;
+                            while (!Items.IsCompleted)
+                            {
+                                if (Items.TryTake(out address) && !address.IsNullOrWhiteSpace())
+                                    Consume(address);
+                                else
+                                    Thread.Sleep(ShortSleep);
+                            }
+                        });
+                        tasks.Add(consume);
+                    }
 
-                Task.WaitAll(tasks.ToArray());
+                    Task.WaitAll(tasks.ToArray());
 
-                // clean up
-                foreach (var task in tasks)
-                {
-                    task.Dispose();
+                    // clean up
+                    foreach (var task in tasks)
+                    {
+                        task.Dispose();
+                    }
                 }
-            }
+            });
+            return run;
         }
 
         public event EventHandler<DynamicEventArgs> ItemComplete
@@ -117,6 +123,14 @@ namespace Yak.Web.Spiders
         }
 
         public delegate void HtmlLoaded(Exception ex, NQuery.NQuery html);
+
+        void ProduceTmpl()
+        {
+            Produce();
+
+            if (!Items.IsNull())
+                Items.CompleteAdding();
+        }
 
         /// <summary>
         /// When implemented in a derived class, produces the addresses for the content to be parsed.

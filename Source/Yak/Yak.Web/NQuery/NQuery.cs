@@ -11,7 +11,7 @@ namespace Yak.Web.NQuery
     public class NQuery : INQuery
     {
         protected HtmlDocument Document { get; set; }
-        protected IEnumerable<HtmlNode> Nodes { get; set; }
+        protected List<HtmlNode> Nodes { get; set; }
 
         // disable public constructor
         protected NQuery(HtmlDocument document)
@@ -19,7 +19,7 @@ namespace Yak.Web.NQuery
             document.ThrowIfNull("document");
 
             Document = document;
-            Nodes = Document.DocumentNode.DescendantsAndSelf();
+            Nodes = Document.DocumentNode.DescendantsAndSelf().ToList();
         }
         protected NQuery(HtmlDocument document, params HtmlNode[] nodes)
         {
@@ -27,7 +27,7 @@ namespace Yak.Web.NQuery
             nodes.ThrowIfNullOrEmpty("nodes");
 
             Document = document;
-            Nodes = nodes;
+            Nodes = new List<HtmlNode>(nodes);
         }
         
         // delegate to HtmlDocument.Load methods
@@ -60,7 +60,7 @@ namespace Yak.Web.NQuery
                 throw new InvalidOperationException("Document is not loaded.");
         }
 
-        HtmlNode First
+        HtmlNode m_First
         {
             get { return Nodes.FirstOrDefault(); }
         }
@@ -72,7 +72,7 @@ namespace Yak.Web.NQuery
             ThrowIfDocumentIsNull();
             selector.ThrowIfNullOrEmpty("selector");
 
-            Nodes = Document.DocumentNode.QuerySelectorAll(selector);
+            Nodes = Document.DocumentNode.QuerySelectorAll(selector).ToList();
             return this;
         }
 
@@ -89,8 +89,8 @@ namespace Yak.Web.NQuery
         {
             ThrowIfDocumentIsNull();
 
-            if (!First.IsNull())
-                return First.OuterHtml;
+            if (!m_First.IsNull())
+                return m_First.OuterHtml;
             
             return null;
         }
@@ -104,9 +104,9 @@ namespace Yak.Web.NQuery
             name.ThrowIfNullOrEmpty("name");
             ThrowIfDocumentIsNull();
 
-            if (!First.IsNull())
+            if (!m_First.IsNull())
             {
-                var attrib = First.Attributes[name];
+                var attrib = m_First.Attributes[name];
                 if (!attrib.IsNull())
                     return attrib.Value;
             }
@@ -122,8 +122,8 @@ namespace Yak.Web.NQuery
         {
             ThrowIfDocumentIsNull();
 
-            if (!First.IsNull())
-                return First.InnerText;
+            if (!m_First.IsNull())
+                return m_First.InnerText;
 
             return null;
         }
@@ -364,6 +364,24 @@ namespace Yak.Web.NQuery
         public INQuery Siblings(string selector)
         {
             throw new NotImplementedException();
+        }
+
+        public INQuery First()
+        {
+            return new NQuery(Document, Nodes.FirstOrDefault());
+        }
+
+        public INQuery Last()
+        {
+            return new NQuery(Document, Nodes.LastOrDefault());
+        }
+
+        public INQuery Each(Action<int, INQuery> action)
+        {
+            for (int i = 0; i < Nodes.Count(); i++)
+                action(i, new NQuery(Document, Nodes[i]));
+
+            return this;
         }
 
         #endregion

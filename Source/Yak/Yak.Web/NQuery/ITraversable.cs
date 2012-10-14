@@ -24,5 +24,9 @@ namespace Yak.Web.NQuery
         INQuery Prev(string selector);
         INQuery PrevAll(string selector);
         INQuery Siblings(string selector);
+
+        INQuery First();
+        INQuery Last();
+        INQuery Each(Action<int, INQuery> action);
     }
 }

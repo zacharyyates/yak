@@ -146,7 +146,7 @@ namespace System
 
         #endregion
 
-        #region Throw Helpers
+        #region Exceptions
 
         const string ArgExNullOrEmptyFormat = "Parameter: {0} cannot be null or empty.";
         const string ArgExNullOrWhiteSpaceFormat = "Parameter: {0} cannot be null or whitespace.";
