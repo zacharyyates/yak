@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Fizzler.Systems.HtmlAgilityPack;
 using HtmlAgilityPack;
@@ -9,16 +10,40 @@ namespace Yak.Web.NQuery
 {
     public class NQuery : INQuery
     {
-        HtmlDocument m_Document;
-        IEnumerable<HtmlNode> m_Nodes;
+        protected HtmlDocument Document { get; set; }
+        protected IEnumerable<HtmlNode> Nodes { get; set; }
 
         // disable public constructor
+        protected NQuery(HtmlDocument document)
+        {
+            document.ThrowIfNull("document");
+
+            Document = document;
+            Nodes = Document.DocumentNode.DescendantsAndSelf();
+        }
         protected NQuery(HtmlDocument document, params HtmlNode[] nodes)
         {
-            m_Document = document;
-            m_Nodes = nodes;
+            document.ThrowIfNull("document");
+            nodes.ThrowIfNullOrEmpty("nodes");
+
+            Document = document;
+            Nodes = nodes;
         }
         
+        // delegate to HtmlDocument.Load methods
+        public static NQuery Load(HtmlDocument document)
+        {
+            return new NQuery(document);
+        }
+        public static NQuery Load(Stream stream)
+        {
+            stream.ThrowIfNull("stream");
+
+            var doc = new HtmlDocument();
+            doc.Load(stream);
+
+            return new NQuery(doc);
+        }
         public static NQuery LoadHtml(string html)
         {
             html.ThrowIfNullOrWhiteSpace("html");
@@ -26,18 +51,18 @@ namespace Yak.Web.NQuery
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
 
-            return new NQuery(doc, doc.DocumentNode.DescendantsAndSelf().ToArray());
+            return new NQuery(doc);
         }
 
         void ThrowIfDocumentIsNull()
         {
-            if (m_Document.IsNull() || m_Document.DocumentNode.IsNull())
+            if (Document.IsNull() || Document.DocumentNode.IsNull())
                 throw new InvalidOperationException("Document is not loaded.");
         }
 
         HtmlNode First
         {
-            get { return m_Nodes.FirstOrDefault(); }
+            get { return Nodes.FirstOrDefault(); }
         }
 
         #region ISelectable Implementation
@@ -47,7 +72,7 @@ namespace Yak.Web.NQuery
             ThrowIfDocumentIsNull();
             selector.ThrowIfNullOrEmpty("selector");
 
-            m_Nodes = m_Document.DocumentNode.QuerySelectorAll(selector);
+            Nodes = Document.DocumentNode.QuerySelectorAll(selector);
             return this;
         }
 
@@ -357,8 +382,8 @@ namespace Yak.Web.NQuery
 
         IEnumerable<INQuery> IterateImpl()
         {
-            foreach (var node in m_Nodes)
-                yield return new NQuery(m_Document, node);
+            foreach (var node in Nodes)
+                yield return new NQuery(Document, node);
         }
 
         #endregion

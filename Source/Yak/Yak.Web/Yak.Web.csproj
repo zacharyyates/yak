@@ -65,6 +65,7 @@
     <Compile Include="NQuery\ITraversable.cs" />
     <Compile Include="NQuery\NQuery.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Spiders\SpiderBase.cs" />
     <Compile Include="WebExtensions.cs" />
     <Compile Include="HtmlCompactorModule.cs" />
   </ItemGroup>

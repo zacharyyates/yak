@@ -2,20 +2,20 @@
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Yak.Web.Test
+namespace Yak.Web.NQuery.Test
 {
     [TestClass]
     public class NQueryTest
     {
         public TestContext Context { get; set; }
 
-        NQuery.NQuery _nq = null;
+        NQuery _nq = null;
 
         [TestInitialize, TestMethod]
         public void LoadHtml()
         {
             var html = File.ReadAllText(@".\Files\jquery.html");
-            _nq = NQuery.NQuery.LoadHtml(html);
+            _nq = NQuery.LoadHtml(html);
         }
 
         [TestMethod, TestCategory("NQuery")]

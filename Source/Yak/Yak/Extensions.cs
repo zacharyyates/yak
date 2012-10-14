@@ -49,7 +49,7 @@ namespace System
         }
 
         /// <summary>
-        /// Indicates whether an <see cref="System.Collections.Generic.IEnumerable<out T>"/> is null or contains no elements.
+        /// Indicates whether an <see cref="System.Collections.Generic.IEnumerable(out T)"/> is null or contains no elements.
         /// </summary>
         public static bool IsNullOrEmpty<T>(this IEnumerable<T> enumerable)
         {
@@ -66,7 +66,7 @@ namespace System
         }
 
         /// <summary>
-        /// Indicates whether an <see cref="System.Collections.Generic.ICollection<T>"/> is null or contains no elements.
+        /// Indicates whether an <see cref="System.Collections.Generic.ICollection(T)"/> is null or contains no elements.
         /// </summary>
         public static bool IsNullOrEmpty<T>(this ICollection<T> collection)
         {
@@ -148,6 +148,9 @@ namespace System
 
         #region Throw Helpers
 
+        const string ArgExNullOrEmptyFormat = "Parameter: {0} cannot be null or empty.";
+        const string ArgExNullOrWhiteSpaceFormat = "Parameter: {0} cannot be null or whitespace.";
+
         public static void ThrowIfNull<T>(this T obj)
         {
             if (obj.IsNull()) throw new ArgumentNullException();
@@ -163,8 +166,18 @@ namespace System
         }
         public static void ThrowIfNullOrEmpty(this string value, string paramName)
         {
-            if (value.IsNullOrEmpty())       
-                throw new ArgumentException("{0} is null or empty.".FormatWith(paramName), paramName);
+            if (value.IsNullOrEmpty())
+                throw new ArgumentException(ArgExNullOrEmptyFormat.FormatWith(paramName), paramName);
+        }
+
+        public static void ThrowIfNullOrEmpty<T>(this IEnumerable<T> enumerable)
+        {
+            if (enumerable.IsNullOrEmpty()) throw new ArgumentException();
+        }
+        public static void ThrowIfNullOrEmpty<T>(this IEnumerable<T> enumerable, string paramName)
+        {
+            if (enumerable.IsNullOrEmpty())
+                throw new ArgumentException(ArgExNullOrEmptyFormat.FormatWith(paramName), paramName);
         }
 
         public static void ThrowIfNullOrWhiteSpace(this string value)
@@ -174,7 +187,7 @@ namespace System
         public static void ThrowIfNullOrWhiteSpace(this string value, string paramName)
         {
             if (value.IsNullOrWhiteSpace())
-                throw new ArgumentException("{0} is null or whitespace.".FormatWith(paramName), paramName);
+                throw new ArgumentException(ArgExNullOrWhiteSpaceFormat.FormatWith(paramName), paramName);
         }
 
         #endregion
