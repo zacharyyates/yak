@@ -341,6 +341,11 @@ namespace Yak.Web.NQuery
             throw new NotImplementedException();
         }
 
+        public INQuery Parent()
+        {
+            var parents = Nodes.Select(n => n.ParentNode).ToArray();
+            return new NQuery(Document, parents);
+        }
         public INQuery Parent(string selector)
         {
             throw new NotImplementedException();

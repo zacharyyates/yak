@@ -19,6 +19,7 @@ namespace Yak.Web.NQuery
         INQuery Find(string selector);
         INQuery Next(string selector);
         INQuery NextAll(string selector);
+        INQuery Parent();
         INQuery Parent(string selector);
         INQuery Parents(string selector);
         INQuery Prev(string selector);
