@@ -1,18 +1,31 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Html;
+using System.IO;
+using System.IO.Compression;
 using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Yak.IO;
 
 namespace Yak.Web.Spiders
 {
     public abstract class SpiderBase
     {
+        public bool UseCache { get; set; }
+        public string CacheDirectory { get; set; }
+
         public int ShortSleep { get; set; }
         public int MaxConsumers { get; set; }
-        protected BlockingCollection<string> Items { get; set; }
+
+        public ParallelOptions ParallelOptions
+        {
+            get { return new ParallelOptions { MaxDegreeOfParallelism = MaxConsumers }; }
+        }
+
+        protected BlockingCollection<string> Work { get; set; }
 
         public SpiderBase()
         {
@@ -20,14 +33,24 @@ namespace Yak.Web.Spiders
             ShortSleep = 500;
         }
 
-        protected Task DownloadHtml(string address, Encoding encoding, HtmlLoaded callback)
+        protected Task DownloadHtml(string url, Encoding encoding, HtmlLoaded callback)
         {
             return Task.Factory.StartNew(() =>
             {
-                using (var client = CreateWebClient(encoding))
-                using (var stream = client.OpenRead(address))
+                if (UseCache)
                 {
-                    return NQuery.NQuery.Load(stream);
+                    using (var stream = Cache(url, encoding))
+                    {
+                        return NQuery.NQuery.Load(stream);
+                    }
+                }
+                else
+                {
+                    using (var client = CreateWebClient(encoding))
+                    using (var stream = client.OpenRead(url))
+                    {
+                        return NQuery.NQuery.Load(stream);
+                    }
                 }
             })
             .ContinueWith((antecedent) =>
@@ -53,6 +76,54 @@ namespace Yak.Web.Spiders
             return DownloadHtml(address, Encoding.UTF8, callback);
         }
 
+        bool IsCached(string path)
+        {
+            return File.Exists(path) && File.GetLastWriteTime(path).FromNow() > TimeSpan.FromDays(1);
+        }
+
+        Stream Cache(string url, Encoding encoding)
+        {
+            try
+            {
+                if (CacheDirectory.IsNullOrWhiteSpace() || !Directory.Exists(CacheDirectory))
+                    CacheDirectory = @".\Cache\";
+
+                DirectoryExtensions.EnsureDirectory(CacheDirectory);
+
+                var fileName = new StringBuilder(url + ".gz")
+                    .Replace("//", "/")
+                    .Replace("/", "_")
+                    .Replace(":", "")
+                    .ToString();
+
+                var path = Path.Combine(CacheDirectory, fileName);
+
+                // if there's no cache or the cache is old, write a new file
+                if (!IsCached(path))
+                {
+                    var ms = new MemoryStream();
+                    using (var client = CreateWebClient(encoding))
+                    using (var stream = client.OpenRead(url))
+                    {
+                        stream.CopyTo(ms);
+                        using (var compressor = new GZipStream(File.OpenWrite(path), CompressionMode.Compress))
+                            ms.CopyTo(compressor);
+                    }
+                    ms.Seek(0, SeekOrigin.Begin);
+                    return ms;
+                }
+                else
+                {
+                    return new GZipStream(File.OpenRead(path), CompressionMode.Decompress);
+                }
+            }
+            catch (Exception ex)
+            {
+                OnItemFailed(new ApplicationException("Downloading {0} failed.".FormatWith(url), ex));
+            }
+            return null;
+        }
+
         protected WebClient CreateWebClient(Encoding encoding)
         {
             var client = new WebClient();
@@ -63,43 +134,33 @@ namespace Yak.Web.Spiders
             return client;
         }
 
-
         // todo: add cancellation token impl, task awaitable
         public virtual Task Run()
         {
             var run = Task.Factory.StartNew(() =>
             {
-                using (Items = new BlockingCollection<string>())
+                using (Work = new BlockingCollection<string>())
                 {
                     var tasks = new List<Task>();
 
-                    var produce = Task.Factory.StartNew(() => ProduceTmpl());
-                    tasks.Add(produce);
+                    tasks.Add(Task.Factory.StartNew(() => ProduceTmpl()));
 
                     for (int i = 0; i < MaxConsumers; i++)
                     {
-                        var consume = Task.Factory.StartNew(() =>
-                        {
-                            string address = null;
-                            while (!Items.IsCompleted)
-                            {
-                                if (Items.TryTake(out address) && !address.IsNullOrWhiteSpace())
-                                    Consume(address);
-                                else
-                                    Thread.Sleep(ShortSleep);
-                            }
-                        });
-                        tasks.Add(consume);
+                        tasks.Add(Task.Factory.StartNew(() => ConsumeTmpl()));
                     }
 
                     Task.WaitAll(tasks.ToArray());
 
-                    // clean up
-                    foreach (var task in tasks)
-                    {
-                        task.Dispose();
-                    }
+                    return tasks;
                 }
+            }).ContinueWith((antecedent) =>
+            {
+                // clean up
+                foreach (var task in antecedent.Result)
+                {
+                    task.Dispose();
+                }  
             });
             return run;
         }
@@ -113,13 +174,21 @@ namespace Yak.Web.Spiders
 
         protected void OnItemComplete(dynamic e)
         {
-            if (m_ItemComplete != null) 
+            if (m_ItemComplete != null)
                 m_ItemComplete(this, e);
         }
 
-        public class DynamicEventArgs : EventArgs
+        public event EventHandler<ExceptionEventArgs> ItemFailed
         {
-            public dynamic Data { get; set; }
+            add { m_ItemFailed += value; }
+            remove { m_ItemFailed -= value; }
+        }
+        EventHandler<ExceptionEventArgs> m_ItemFailed;
+
+        protected void OnItemFailed(ExceptionEventArgs e)
+        {
+            if (m_ItemFailed != null)
+                m_ItemFailed(this, e);
         }
 
         public delegate void HtmlLoaded(Exception ex, NQuery.NQuery html);
@@ -128,14 +197,26 @@ namespace Yak.Web.Spiders
         {
             Produce();
 
-            if (!Items.IsNull())
-                Items.CompleteAdding();
+            if (!Work.IsNull())
+                Work.CompleteAdding();
         }
 
         /// <summary>
         /// When implemented in a derived class, produces the addresses for the content to be parsed.
         /// </summary>
         protected abstract void Produce();
+
+        void ConsumeTmpl()
+        {
+            string address = null;
+            while (!Work.IsCompleted)
+            {
+                if (Work.TryTake(out address) && !address.IsNullOrWhiteSpace())
+                    Consume(address);
+                else
+                    Thread.Sleep(ShortSleep);
+            }
+        }
 
         /// <summary>
         /// When implemented in a derived class, retrieves and parses the content at address.
