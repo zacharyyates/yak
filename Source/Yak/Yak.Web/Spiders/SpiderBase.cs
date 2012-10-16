@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Html;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
@@ -14,24 +13,31 @@ namespace Yak.Web.Spiders
 {
     public abstract class SpiderBase
     {
+        Queue<string> m_Work = new Queue<string>();
+        bool m_CompletedAdding = false;
+
+        protected virtual bool TryAddWork(string url)
+        {
+            if (!m_CompletedAdding)
+            {
+                m_Work.Enqueue(url);
+                return true;
+            }
+            return false;
+        }
+        protected virtual bool TryTakeWork(out string url)
+        {
+            if (m_Work.Any())
+            {
+                url = m_Work.Dequeue();
+                return true;
+            }
+            url = null;
+            return false;
+        }
+
         public bool UseCache { get; set; }
-        public string CacheDirectory { get; set; }
-
-        public int ShortSleep { get; set; }
-        public int MaxConsumers { get; set; }
-
-        public ParallelOptions ParallelOptions
-        {
-            get { return new ParallelOptions { MaxDegreeOfParallelism = MaxConsumers }; }
-        }
-
-        protected BlockingCollection<string> Work { get; set; }
-
-        public SpiderBase()
-        {
-            MaxConsumers = 25;
-            ShortSleep = 500;
-        }
+        public string CacheDirectory { get; set; }      
 
         protected Task DownloadHtml(string url, Encoding encoding, HtmlLoaded callback)
         {
@@ -71,9 +77,24 @@ namespace Yak.Web.Spiders
                 }
             });
         }
-        protected Task DownloadHtml(string address, HtmlLoaded callback)
+        protected Task DownloadHtml(string url, HtmlLoaded callback)
         {
-            return DownloadHtml(address, Encoding.UTF8, callback);
+            return DownloadHtml(url, Encoding.UTF8, callback);
+        }
+        protected NQuery.NQuery DownloadHtml(string url, Encoding encoding)
+        {
+            NQuery.NQuery nq = null;
+            Exception dlEx = null;
+            DownloadHtml(url, encoding, (ex, html) =>
+            {
+                dlEx = ex;
+                nq = html;
+            }).Wait();
+
+            if (!dlEx.IsNull())
+                return nq;
+            else
+                throw dlEx;
         }
 
         bool IsCached(string path)
@@ -134,35 +155,13 @@ namespace Yak.Web.Spiders
             return client;
         }
 
-        // todo: add cancellation token impl, task awaitable
-        public virtual Task Run()
+        public virtual void Run()
         {
-            var run = Task.Factory.StartNew(() =>
+            Produce();
+            foreach (var url in m_Work)
             {
-                using (Work = new BlockingCollection<string>())
-                {
-                    var tasks = new List<Task>();
-
-                    tasks.Add(Task.Factory.StartNew(() => ProduceTmpl()));
-
-                    for (int i = 0; i < MaxConsumers; i++)
-                    {
-                        tasks.Add(Task.Factory.StartNew(() => ConsumeTmpl()));
-                    }
-
-                    Task.WaitAll(tasks.ToArray());
-
-                    return tasks;
-                }
-            }).ContinueWith((antecedent) =>
-            {
-                // clean up
-                foreach (var task in antecedent.Result)
-                {
-                    task.Dispose();
-                }  
-            });
-            return run;
+                Consume(url);
+            }
         }
 
         public event EventHandler<DynamicEventArgs> ItemComplete
@@ -193,30 +192,10 @@ namespace Yak.Web.Spiders
 
         public delegate void HtmlLoaded(Exception ex, NQuery.NQuery html);
 
-        void ProduceTmpl()
-        {
-            Produce();
-
-            if (!Work.IsNull())
-                Work.CompleteAdding();
-        }
-
         /// <summary>
         /// When implemented in a derived class, produces the addresses for the content to be parsed.
         /// </summary>
         protected abstract void Produce();
-
-        void ConsumeTmpl()
-        {
-            string address = null;
-            while (!Work.IsCompleted)
-            {
-                if (Work.TryTake(out address) && !address.IsNullOrWhiteSpace())
-                    Consume(address);
-                else
-                    Thread.Sleep(ShortSleep);
-            }
-        }
 
         /// <summary>
         /// When implemented in a derived class, retrieves and parses the content at address.
