@@ -68,7 +68,7 @@
     <Compile Include="Spiders\AsyncSpiderBase.cs" />
     <Compile Include="Spiders\SpiderBase.cs" />
     <Compile Include="WebExtensions.cs" />
-    <Compile Include="HtmlCompactorModule.cs" />
+    <Compile Include="WhiteSpaceFilterModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Yak\Yak.csproj">

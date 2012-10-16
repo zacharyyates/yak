@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Yak.Test
 {
     [TestClass]
-    public class HtmlCompactorTest
+    public class WhiteSpaceFilterTest
     {
         string m_Html1 =
             @"<html lang='en'>
@@ -20,21 +20,21 @@ namespace Yak.Test
             @"<html lang='en'><head> </head><body onload='go();'><div> hi, hello how are you</div></body></html>";
 
         [TestMethod]
-        public void Compact()
+        public void Filter()
         {
-            var actual = HtmlCompactor.Compact(m_Html1);
+            var actual = WhiteSpaceFilter.Filter(m_Html1);
             Assert.AreEqual(m_Html1Compacted, actual);
         }
 
         [TestMethod]
-        public void CompactPerf()
+        public void FilterPerf()
         {
             var iterations = TestSettings.PerformanceIterations;
             var watch = new Stopwatch();
             watch.Start();
             for (int i = 0; i < iterations; i++)
             {
-                Compact();
+                Filter();
             }
             watch.Stop();
 

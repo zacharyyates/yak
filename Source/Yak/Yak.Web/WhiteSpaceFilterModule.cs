@@ -8,7 +8,7 @@ namespace System.Web
     /// Removes whitespace from an html response.
     /// </summary>
     // adapted from: http://madskristensen.net/post/A-whitespace-removal-HTTP-module-for-ASPNET-20.aspx
-    public class HtmlCompactorModule : IHttpModule
+    public class WhiteSpaceFilterModule : IHttpModule
     {
         #region IHttpModule Members
 
@@ -28,17 +28,17 @@ namespace System.Web
             var app = sender as HttpApplication;
             if (app.Request.RawUrl.Contains(".html"))
             {
-                app.Response.Filter = new HtmlCompactorStream(app.Response.Filter);
+                app.Response.Filter = new WhiteSpaceFilterStream(app.Response.Filter);
             }
         }
 
         #region Stream filter
 
-        class HtmlCompactorStream : Stream
+        class WhiteSpaceFilterStream : Stream
         {
             Stream m_Sink;
             
-            public HtmlCompactorStream(Stream sink)
+            public WhiteSpaceFilterStream(Stream sink)
             {
                 m_Sink = sink;
             }
@@ -102,7 +102,7 @@ namespace System.Web
                 Buffer.BlockCopy(buffer, offset, data, 0, count);
 
                 var html = encoding.GetString(buffer);
-                html = HtmlCompactor.Compact(html);
+                html = WhiteSpaceFilter.Filter(html);
 
                 var outdata = encoding.GetBytes(html);
                 m_Sink.Write(outdata, 0, outdata.GetLength(0));

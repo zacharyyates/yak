@@ -55,7 +55,7 @@
     <Compile Include="TestSettings.cs" />
     <Compile Include="TypeExtensionsTest.cs" />
     <Compile Include="NumericExtensionsTest.cs" />
-    <Compile Include="Html\HtmlCompactorTest.cs" />
+    <Compile Include="Html\WhiteSpaceFilterTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Yak\Yak.csproj">

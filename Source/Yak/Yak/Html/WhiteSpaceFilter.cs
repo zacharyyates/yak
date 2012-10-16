@@ -3,11 +3,11 @@ using System.Text.RegularExpressions;
 
 namespace System.Html
 {
-    public class HtmlCompactor
+    public class WhiteSpaceFilter
     {
         static Regex m_RemoveWhitespace = new Regex(@"(?<=\s)[\s]+", RegexOptions.Compiled);
 
-        public static string Compact(string html)
+        public static string Filter(string html)
         {
             var output = new StringBuilder(m_RemoveWhitespace.Replace(html, string.Empty));
             output = output.Replace("\r", string.Empty);
