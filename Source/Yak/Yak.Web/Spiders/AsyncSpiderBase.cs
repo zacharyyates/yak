@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Yak.Web.Spiders
 {
-    public abstract class AsyncSpiderBase : SpiderBase
+    public abstract class AsyncSpiderBase : SpiderBase<string>
     {
         public int ShortSleep { get; set; }
         public int MaxConsumers { get; set; }

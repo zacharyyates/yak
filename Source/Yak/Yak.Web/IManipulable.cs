@@ -1,5 +1,5 @@
 ﻿
-namespace Yak.Web.NQuery
+namespace Yak.Web
 {
     public interface IManipulable
     {

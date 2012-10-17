@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Yak.Web.NQuery
+namespace Yak.Web
 {
     public interface ITraversable
     {

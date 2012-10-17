@@ -6,7 +6,7 @@ using System.Linq;
 using Fizzler.Systems.HtmlAgilityPack;
 using HtmlAgilityPack;
 
-namespace Yak.Web.NQuery
+namespace Yak.Web
 {
     public class NQuery : INQuery
     {
