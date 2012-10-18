@@ -76,17 +76,17 @@ namespace Yak.Web.Spiders
                 m_ItemComplete(this, e);
         }
 
-        public event EventHandler<ExceptionEventArgs> ItemFailed
+        public event EventHandler<ExceptionEventArgs> ItemFail
         {
-            add { m_ItemFailed += value; }
-            remove { m_ItemFailed -= value; }
+            add { m_ItemFail += value; }
+            remove { m_ItemFail -= value; }
         }
-        EventHandler<ExceptionEventArgs> m_ItemFailed;
+        EventHandler<ExceptionEventArgs> m_ItemFail;
 
-        protected void OnItemFailed(ExceptionEventArgs e)
+        protected void OnItemFail(ExceptionEventArgs e)
         {
-            if (m_ItemFailed != null)
-                m_ItemFailed(this, e);
+            if (m_ItemFail != null)
+                m_ItemFail(this, e);
         }
 
         public virtual void Run()

@@ -43,6 +43,7 @@
     <Compile Include="DateTimeExtensions.cs" />
     <Compile Include="DynamicEventArgs.cs" />
     <Compile Include="ExceptionEventArgs.cs" />
+    <Compile Include="ExceptionExtensions.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="IDeepCloneable.cs" />
     <Compile Include="IO\DirectoryExtensions.cs" />
