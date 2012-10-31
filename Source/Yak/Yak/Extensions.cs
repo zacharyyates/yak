@@ -123,6 +123,18 @@ namespace System
             return output.ToString();
         }
 
+        public static string[] Split(this string str, StringSplitOptions options, params char[] separator)
+        {
+            str.ThrowIfNull("str");
+            return str.Split(separator, options);
+        }
+
+        public static string[] Split(this string str, StringSplitOptions options, params string[] separator)
+        {
+            str.ThrowIfNull("str");
+            return str.Split(separator, options);
+        }
+
         #endregion
 
         #region Exceptions
