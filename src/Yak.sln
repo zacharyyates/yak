@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yak", "Yak\Yak.csproj", "{FDBFAE45-6059-4E87-BEFB-346F040286E7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yak.Test", "Yak.Test\Yak.Test.csproj", "{593F2D94-EFB1-4437-A5EF-BFA105EA247D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yak.Web", "Yak.Web\Yak.Web.csproj", "{EF1B81C1-E330-42BA-A77E-7717EEA70C8E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yak.Web.Test", "Yak.Web.Test\Yak.Web.Test.csproj", "{40457629-B6E5-4A80-AE35-6A5616DD7513}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FDBFAE45-6059-4E87-BEFB-346F040286E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDBFAE45-6059-4E87-BEFB-346F040286E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDBFAE45-6059-4E87-BEFB-346F040286E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDBFAE45-6059-4E87-BEFB-346F040286E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{593F2D94-EFB1-4437-A5EF-BFA105EA247D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{593F2D94-EFB1-4437-A5EF-BFA105EA247D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{593F2D94-EFB1-4437-A5EF-BFA105EA247D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{593F2D94-EFB1-4437-A5EF-BFA105EA247D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF1B81C1-E330-42BA-A77E-7717EEA70C8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF1B81C1-E330-42BA-A77E-7717EEA70C8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF1B81C1-E330-42BA-A77E-7717EEA70C8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF1B81C1-E330-42BA-A77E-7717EEA70C8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40457629-B6E5-4A80-AE35-6A5616DD7513}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40457629-B6E5-4A80-AE35-6A5616DD7513}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40457629-B6E5-4A80-AE35-6A5616DD7513}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40457629-B6E5-4A80-AE35-6A5616DD7513}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
