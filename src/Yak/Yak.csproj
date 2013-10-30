@@ -31,6 +31,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -40,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collections\Generic\Extensions.cs" />
+    <Compile Include="Configuration\Config.cs" />
     <Compile Include="DateTimeExtensions.cs" />
     <Compile Include="DynamicEventArgs.cs" />
     <Compile Include="EnumerableExtensions.cs" />
