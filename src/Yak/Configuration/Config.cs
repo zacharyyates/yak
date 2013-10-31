@@ -133,6 +133,15 @@ namespace Yak.Configuration {
             }
         }
 
+        public static string GetConnectionString(string key) {
+            key.ThrowIfNullOrWhiteSpace("key");
+            try {
+                return ConfigurationManager.ConnectionStrings[key].ConnectionString;
+            } catch (Exception ex) {
+                throw CreateConfigurationException(key, ex);
+            }
+        }
+
         static Exception CreateConfigurationException(string key, Exception inner) {
             return new ConfigurationErrorsException("Could not get appSetting: {0}".Fmt(key), inner);
         }

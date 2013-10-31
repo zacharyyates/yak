@@ -34,33 +34,16 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-  </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
       <ItemGroup>
         <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
       </ItemGroup>
     </When>
-    <Otherwise>
-      <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
-      </ItemGroup>
-    </Otherwise>
+    <Otherwise />
   </Choose>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Yak.Web\Yak.Web.csproj">
-      <Project>{ef1b81c1-e330-42ba-a77e-7717eea70c8e}</Project>
-      <Name>Yak.Web</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Yak\Yak.csproj">
-      <Project>{fdbfae45-6059-4e87-befb-346f040286e7}</Project>
-      <Name>Yak</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Choose>
